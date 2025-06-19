@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "fastqscreen"
+description: Run FastQscreen on sequenced reads
+keywords:
+  - quality control
+  - qc
+  - fastqscreen
+tools:
+  - fastqscreen:
+      description: "FastQ Screen allows you to screen a library of sequences in FastQ format against a set of sequence databases so you can see if the composition of the library matches with what you expect."
+      homepage: https://bioconda.github.io/recipes/fastq-screen/README.html
+      documentation: https://bioconda.github.io/recipes/fastq-screen/README.html
+      tool_dev_url: "https://github.com/StevenWingett/FastQ-Screen"
+      doi: ""
+      licence: ["GPL v3-or-later"]
+      identifier: biotools:fastqscreen
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+
+output:
+  - html:
+      type: file
+      description: FastQ_screen report html
+      pattern: "*_{screen.html}"
+  - png:
+      type: file
+      description: fastq_screen report png
+      pattern: "*_{screen.png}"
+  - txt:
+      type: file
+      description: FastQ_screen report txt
+      pattern: "*_{screen.txt}"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+
+authors:
+  - "@tropicalberto"
+maintainers:
+  - "@tropicalberto"
