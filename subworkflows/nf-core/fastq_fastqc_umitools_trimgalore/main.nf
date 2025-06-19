@@ -5,6 +5,7 @@
 include { FASTQC           } from '../../../modules/nf-core/fastqc/main'
 include { UMITOOLS_EXTRACT } from '../../../modules/nf-core/umitools/extract/main'
 include { TRIMGALORE       } from '../../../modules/nf-core/trimgalore/main'
+include { FASTQSCREEN      } from '../../../modules/local/fastqscreen/main'
 
 //
 // Function that parses TrimGalore log output file to get total number of reads after trimming
@@ -41,6 +42,7 @@ workflow FASTQ_FASTQC_UMITOOLS_TRIMGALORE {
     fastqc_zip = Channel.empty()
     if (!skip_fastqc) {
         FASTQC(reads)
+        FASTQSCREEN(reads)
         fastqc_html = FASTQC.out.html
         fastqc_zip = FASTQC.out.zip
         ch_versions = ch_versions.mix(FASTQC.out.versions.first())

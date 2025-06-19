@@ -3,6 +3,7 @@
 //
 include { FASTQC as FASTQC_RAW  } from '../../../modules/nf-core/fastqc/main'
 include { FASTQC as FASTQC_TRIM } from '../../../modules/nf-core/fastqc/main'
+include { FASTQSCREEN           } from '../../../modules/local/fastqscreen/main'
 include { UMITOOLS_EXTRACT      } from '../../../modules/nf-core/umitools/extract/main'
 include { FASTP                 } from '../../../modules/nf-core/fastp/main'
 
@@ -67,6 +68,7 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
         FASTQC_RAW(
             reads
         )
+        FASTQSCREEN(reads)
         fastqc_raw_html = FASTQC_RAW.out.html
         fastqc_raw_zip = FASTQC_RAW.out.zip
         ch_versions = ch_versions.mix(FASTQC_RAW.out.versions.first())
