@@ -11,6 +11,7 @@ include { DESEQ2_QC as DESEQ2_QC_STAR_SALMON } from '../../modules/local/deseq2_
 include { DESEQ2_QC as DESEQ2_QC_RSEM        } from '../../modules/local/deseq2_qc'
 include { DESEQ2_QC as DESEQ2_QC_PSEUDO      } from '../../modules/local/deseq2_qc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../../modules/local/multiqc_custom_biotype'
+include { FASTQSCREEN                        } from '../../modules/local/fastqscreen'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules

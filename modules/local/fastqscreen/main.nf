@@ -14,6 +14,7 @@ process FASTQSCREEN {
     //               e.g. "*.fastq.gz" and NOT "*.fastq", "*.bam" and NOT "*.sam" etc.
     input:
     tuple val(meta), path(reads)
+    path(fastqscreen_config)
 
     output:
     // Named file extensions MUST be emitted for ALL output channels
@@ -29,6 +30,7 @@ process FASTQSCREEN {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    def config = fastqscreen_config ? "--conf $fastqscreen_config" : ''
     // Where possible, a command MUST be provided to obtain the version number of the software e.g. 1.10
     //               If the software is unable to output a version number on the command-line then it can be manually specified
     //               e.g. https://github.com/nf-core/modules/blob/master/modules/nf-core/homer/annotatepeaks/main.nf
@@ -47,7 +49,7 @@ process FASTQSCREEN {
     
     fastq_screen \\
         --aligner bowtie2 \\
-        --conf /tzu-share/resources/fastq_screen/fastq_screen.conf \\
+        ${config} \\
         ${args} \\
         --threads ${task.cpus} \\
         ${renamed_files}
