@@ -97,6 +97,7 @@ run_modules:
   - rseqc
   - qualimap
   - kraken
+  - fastq_screen
 
 # Order of modules
 
