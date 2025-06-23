@@ -53,6 +53,9 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
     ch_versions = Channel.empty()
     fastqc_raw_html = Channel.empty()
     fastqc_raw_zip = Channel.empty()
+    fastqscreen_html = Channel.empty()
+    fastqscreen_png = Channel.empty()
+    fastqscreen_txt = Channel.empty()
     umi_log = Channel.empty()
     trim_json = Channel.empty()
     trim_html = Channel.empty()
@@ -63,14 +66,18 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
     fastqc_trim_zip = Channel.empty()
     trim_read_count = Channel.empty()
     adapter_seq = Channel.empty()
+    ch_fastqscreen_config = Channel.fromPath("$projectDir/workflows/rnaseq/assets/fastqscreen/fastq_screen.conf", checkIfExists: true)
 
     if (!skip_fastqc) {
         FASTQC_RAW(
             reads
         )
-        FASTQSCREEN(reads)
+        FASTQSCREEN(reads, ch_fastqscreen_config.toList())
         fastqc_raw_html = FASTQC_RAW.out.html
         fastqc_raw_zip = FASTQC_RAW.out.zip
+        fastqscreen_html = FASTQSCREEN.out.html
+        fastqscreen_png = FASTQSCREEN.out.png
+        fastqscreen_txt = FASTQSCREEN.out.txt
         ch_versions = ch_versions.mix(FASTQC_RAW.out.versions.first())
     }
 
@@ -141,6 +148,9 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
     reads             = trim_reads // channel: [ val(meta), [ reads ] ]
     fastqc_raw_html   // channel: [ val(meta), [ html ] ]
     fastqc_raw_zip    // channel: [ val(meta), [ zip ] ]
+    fastqscreen_html // channel: [ val(meta), [ html ] ]
+    fastqscreen_png  // channel: [ val(meta), [ png ] ]
+    fastqscreen_txt  // channel: [ val(meta), [ txt ] ]
     umi_log           // channel: [ val(meta), [ log ] ]
     adapter_seq       // channel: [ val(meta), [ adapter_seq] ]
     trim_json         // channel: [ val(meta), [ json ] ]

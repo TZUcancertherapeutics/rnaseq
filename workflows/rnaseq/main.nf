@@ -11,7 +11,6 @@ include { DESEQ2_QC as DESEQ2_QC_STAR_SALMON } from '../../modules/local/deseq2_
 include { DESEQ2_QC as DESEQ2_QC_RSEM        } from '../../modules/local/deseq2_qc'
 include { DESEQ2_QC as DESEQ2_QC_PSEUDO      } from '../../modules/local/deseq2_qc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../../modules/local/multiqc_custom_biotype'
-include { FASTQSCREEN                        } from '../../modules/local/fastqscreen'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -44,7 +43,8 @@ include { STRINGTIE_STRINGTIE        } from '../../modules/nf-core/stringtie/str
 include { SUBREAD_FEATURECOUNTS      } from '../../modules/nf-core/subread/featurecounts'
 include { KRAKEN2_KRAKEN2 as KRAKEN2 } from '../../modules/nf-core/kraken2/kraken2/main'
 include { BRACKEN_BRACKEN as BRACKEN } from '../../modules/nf-core/bracken/bracken/main'
-include { MULTIQC                    } from '../../modules/nf-core/multiqc'
+include { MULTIQC as MULTIQC_BAM     } from '../../modules/nf-core/multiqc'
+include { MULTIQC as MULTIQC_FASTQSCREEN  } from '../../modules/nf-core/multiqc'
 include { BEDTOOLS_GENOMECOV as BEDTOOLS_GENOMECOV_FW          } from '../../modules/nf-core/bedtools/genomecov'
 include { BEDTOOLS_GENOMECOV as BEDTOOLS_GENOMECOV_REV         } from '../../modules/nf-core/bedtools/genomecov'
 
@@ -101,6 +101,7 @@ workflow RNASEQ {
     main:
 
     ch_multiqc_files = Channel.empty()
+    ch_multiqc_fastqscreen_files = Channel.empty()
     ch_trim_status = Channel.empty()
     ch_map_status = Channel.empty()
     ch_strand_status = Channel.empty()
@@ -160,6 +161,7 @@ workflow RNASEQ {
     )
 
     ch_multiqc_files                  = ch_multiqc_files.mix(FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS.out.multiqc_files)
+    ch_multiqc_fastqscreen_files      = ch_multiqc_fastqscreen_files.mix(FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS.out.multiqc_fastqscreen_files)
     ch_versions                       = ch_versions.mix(FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS.out.versions)
     ch_strand_inferred_filtered_fastq = FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS.out.reads
     ch_trim_read_count                = FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS.out.trim_read_count
@@ -752,7 +754,7 @@ workflow RNASEQ {
             .flatten()
             .collectFile(name: 'name_replacement.txt', newLine: true)
 
-        MULTIQC (
+        MULTIQC_BAM (
             ch_multiqc_files.collect(),
             ch_multiqc_config.toList(),
             ch_multiqc_custom_config.toList(),
@@ -760,7 +762,18 @@ workflow RNASEQ {
             ch_name_replacements,
             []
         )
-        ch_multiqc_report = MULTIQC.out.report
+        ch_multiqc_report = MULTIQC_BAM.out.report
+
+        ch_multiqc_fastqscreen_htmls = ch_multiqc_fastqscreen_files.map { meta, html -> html }        // MultiQC on Fastqscreen report //
+        MULTIQC_FASTQSCREEN (
+            ch_multiqc_fastqscreen_htmls.collect(),
+            ch_multiqc_config.toList(),
+            ch_multiqc_custom_config.toList(),
+            ch_multiqc_logo.toList(),
+            ch_name_replacements,
+            []
+        )
+        ch_multiqc_fastqscreen_report = MULTIQC_FASTQSCREEN.out.report
     }
 
     emit:

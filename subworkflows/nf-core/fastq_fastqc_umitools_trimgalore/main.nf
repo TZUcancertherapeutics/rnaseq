@@ -39,12 +39,19 @@ workflow FASTQ_FASTQC_UMITOOLS_TRIMGALORE {
     main:
     ch_versions = Channel.empty()
     fastqc_html = Channel.empty()
+    fastqc_png = Channel.empty()
+    fastqc_txt = Channel.empty()
     fastqc_zip = Channel.empty()
+    ch_fastqscreen_config = Channel.fromPath("$projectDir/workflows/rnaseq/assets/fastqscreen/fastq_screen.conf", checkIfExists: true)
+
     if (!skip_fastqc) {
         FASTQC(reads)
-        FASTQSCREEN(reads)
+        FASTQSCREEN(reads, ch_fastqscreen_config.toList())
         fastqc_html = FASTQC.out.html
         fastqc_zip = FASTQC.out.zip
+        fastqscreen_html = FASTQSCREEN.out.html
+        fastqscreen_png = FASTQSCREEN.out.png
+        fastqscreen_txt = FASTQSCREEN.out.txt
         ch_versions = ch_versions.mix(FASTQC.out.versions.first())
     }
 
@@ -107,14 +114,17 @@ workflow FASTQ_FASTQC_UMITOOLS_TRIMGALORE {
     }
 
     emit:
-    reads           = trim_reads // channel: [ val(meta), [ reads ] ]
-    fastqc_html     // channel: [ val(meta), [ html ] ]
-    fastqc_zip      // channel: [ val(meta), [ zip ] ]
-    umi_log         // channel: [ val(meta), [ log ] ]
-    trim_unpaired   // channel: [ val(meta), [ reads ] ]
-    trim_html       // channel: [ val(meta), [ html ] ]
-    trim_zip        // channel: [ val(meta), [ zip ] ]
-    trim_log        // channel: [ val(meta), [ txt ] ]
-    trim_read_count // channel: [ val(meta), val(count) ]
-    versions        = ch_versions // channel: [ versions.yml ]
+    reads              = trim_reads // channel: [ val(meta), [ reads ] ]
+    fastqc_html        // channel: [ val(meta), [ html ] ]
+    fastqc_zip         // channel: [ val(meta), [ zip ] ]
+    fastqscreen_html  // channel: [ val(meta), [ html ] ]
+    fastqscreen_png   // channel: [ val(meta), [ png ] ]
+    fastqscreen_txt   // channel: [ val(meta), [ txt ] ]
+    umi_log            // channel: [ val(meta), [ log ] ]
+    trim_unpaired      // channel: [ val(meta), [ reads ] ]
+    trim_html          // channel: [ val(meta), [ html ] ]
+    trim_zip           // channel: [ val(meta), [ zip ] ]
+    trim_log           // channel: [ val(meta), [ txt ] ]
+    trim_read_count    // channel: [ val(meta), val(count) ]
+    versions           = ch_versions // channel: [ versions.yml ]
 }

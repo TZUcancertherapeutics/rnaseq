@@ -116,6 +116,7 @@ workflow FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS {
     ch_filtered_reads = Channel.empty()
     ch_trim_read_count = Channel.empty()
     ch_multiqc_files = Channel.empty()
+    ch_multiqc_fastqscreen_files = Channel.empty()
     ch_lint_log = Channel.empty()
 
     ch_reads
@@ -170,6 +171,10 @@ workflow FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS {
             .mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_zip)
             .mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.trim_log)
             .mix(ch_multiqc_files)
+        ch_multiqc_fastqscreen_files = FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.fastqscreen_html
+            .mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.fastqscreen_png)
+            .mix(FASTQ_FASTQC_UMITOOLS_TRIMGALORE.out.fastqscreen_txt)
+            .mix(ch_multiqc_fastqscreen_files)
     }
 
     //
@@ -196,6 +201,10 @@ workflow FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS {
             .mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip)
             .mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json)
             .mix(ch_multiqc_files)
+        ch_multiqc_fastqscreen_files = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqscreen_html
+            .mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqscreen_png)
+            .mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqscreen_txt)
+            .mix(ch_multiqc_fastqscreen_files)
     }
 
     def pass_trimmed_reads = [:]
@@ -339,9 +348,10 @@ workflow FASTQ_QC_TRIM_FILTER_SETSTRANDEDNESS {
         .set { ch_strand_inferred_fastq }
 
     emit:
-    lint_log        = ch_lint_log
-    reads           = ch_strand_inferred_fastq
-    trim_read_count = ch_trim_read_count
-    multiqc_files   = ch_multiqc_files.transpose().map { it[1] }
-    versions        = ch_versions // channel: [ versions.yml ]
+    lint_log                    = ch_lint_log
+    reads                       = ch_strand_inferred_fastq
+    trim_read_count             = ch_trim_read_count
+    multiqc_files               = ch_multiqc_files.transpose().map { it[1] }
+    multiqc_fastqscreen_files   = ch_multiqc_fastqscreen_files
+    versions                    = ch_versions // channel: [ versions.yml ]
 }
