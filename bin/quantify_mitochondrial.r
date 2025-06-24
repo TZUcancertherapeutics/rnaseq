@@ -77,14 +77,60 @@ mito_summary <- data.frame(
   percent_reads_mitochondrial = seurat_obj$percent_mito
 )
 
+# write.table(
+#   mito_summary,
+#   file = "mitochondrial_read_percentages.tsv",
+#   sep = "\t",
+#   row.names = FALSE,
+#   quote = FALSE
+# )
+
+################################################
+################################################
+## QUANTIFY MITOCHONDRIAL GENES               ##
+################################################
+################################################
+mito_genes <- grep("^MT", rownames(seurat_obj), ignore.case = TRUE, value = TRUE)
+
+if (length(mito_genes) == 0) {
+  warning("No mitochondrial genes found using regex '^MT'.")
+  seurat_obj$percent_mito <- 0
+} else {
+  seurat_obj <- PercentageFeatureSet(seurat_obj, features = mito_genes, col.name = "percent_mito")
+}
+
+################################################
+################################################
+## QUANTIFY RIBOSOMAL GENES                   ##
+################################################
+################################################
+ribo_genes <- grep("^RPS|^RPL", rownames(seurat_obj), ignore.case = TRUE, value = TRUE)
+
+if (length(ribo_genes) == 0) {
+  warning("No ribosomal genes found using regex '^RPS|^RPL'.")
+  seurat_obj$percent_ribo <- 0
+} else {
+  seurat_obj <- PercentageFeatureSet(seurat_obj, features = ribo_genes, col.name = "percent_ribo")
+}
+
+################################################
+################################################
+## OUTPUT COMBINED SUMMARY                    ##
+################################################
+################################################
+summary_df <- data.frame(
+  sample = colnames(seurat_obj),
+  percent_reads_mitochondrial = seurat_obj$percent_mito,
+  percent_reads_ribosomal = seurat_obj$percent_ribo
+)
+
 write.table(
-  mito_summary,
-  file = "mitochondrial_read_percentages.tsv",
+  summary_df,
+  file = "mito_ribo_read_percentages.tsv",
   sep = "\t",
   row.names = FALSE,
   quote = FALSE
 )
-
 
 ################################################
 ################################################
