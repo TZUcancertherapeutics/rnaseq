@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - conda-forge::r-base=4.4.1
+  - conda-forge::r-seurat=5.3.0
+  - conda-forge::r-matrix=1.6_5
+  - conda-forge::r-optparse>=1.7.4
+  - conda-forge::r-dplyr>=1.1.4        # compatible with R 4.4
+  - conda-forge::r-optparse>=1.7.4     # compatible with R 4.4
