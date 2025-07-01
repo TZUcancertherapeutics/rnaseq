@@ -11,6 +11,9 @@ include { DESEQ2_QC as DESEQ2_QC_STAR_SALMON } from '../../modules/local/deseq2_
 include { DESEQ2_QC as DESEQ2_QC_RSEM        } from '../../modules/local/deseq2_qc'
 include { DESEQ2_QC as DESEQ2_QC_PSEUDO      } from '../../modules/local/deseq2_qc'
 include { MULTIQC_CUSTOM_BIOTYPE             } from '../../modules/local/multiqc_custom_biotype'
+include { GENES_QUANTIFY as  GENES_QUANTIFY_STAR_SALMON} from '../../modules/local/gexp'
+include { GENES_QUANTIFY as  GENES_QUANTIFY_RSEM       } from '../../modules/local/gexp'
+include { GENES_QUANTIFY as  GENES_QUANTIFY_PSEUDO     } from '../../modules/local/gexp'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -270,6 +273,9 @@ workflow RNASEQ {
             ch_multiqc_files = ch_multiqc_files.mix(DESEQ2_QC_STAR_SALMON.out.pca_multiqc.collect())
             ch_multiqc_files = ch_multiqc_files.mix(DESEQ2_QC_STAR_SALMON.out.dists_multiqc.collect())
             ch_versions = ch_versions.mix(DESEQ2_QC_STAR_SALMON.out.versions)
+            GENES_QUANTIFY_STAR_SALMON (
+                ch_counts_gene_length_scaled.map { it[1] }
+            )
         }
     }
 
@@ -305,6 +311,9 @@ workflow RNASEQ {
             ch_multiqc_files = ch_multiqc_files.mix(DESEQ2_QC_RSEM.out.pca_multiqc.collect())
             ch_multiqc_files = ch_multiqc_files.mix(DESEQ2_QC_RSEM.out.dists_multiqc.collect())
             ch_versions = ch_versions.mix(DESEQ2_QC_RSEM.out.versions)
+            GENES_QUANTIFY_RSEM (
+                ch_counts_gene_length_scaled.map { it[1] }
+            )
         }
     }
 
@@ -687,6 +696,9 @@ workflow RNASEQ {
             ch_multiqc_files = ch_multiqc_files.mix(DESEQ2_QC_PSEUDO.out.pca_multiqc.collect())
             ch_multiqc_files = ch_multiqc_files.mix(DESEQ2_QC_PSEUDO.out.dists_multiqc.collect())
             ch_versions = ch_versions.mix(DESEQ2_QC_PSEUDO.out.versions)
+            GENES_QUANTIFY_PSEUDO (
+                ch_counts_gene_length_scaled.map { it[1] }
+            )
         }
     }
 
